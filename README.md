@@ -1,16 +1,31 @@
 ## Getting Started
 
-1. Go to the repository on GitHub and click the "Fork" button.
+### Prerequisites
+- Node.js (v18 or higher)
+- npm, yarn, pnpm, or bun
 
-Then, clone your forked repository:
+### Installation
 
+1. Fork the repository by clicking the "Fork" button on GitHub.
+
+2. Clone your forked repository:
 ```bash
-git clone <https://github.com/In2Event/assignment-sam.git>
-cd <assignment-sam>
+git clone https://github.com/YOUR_USERNAME/in2event-frontend-assignment.git
+cd in2event-frontend-assignment
 ```
 
-Then, run the development server:
+3. Install dependencies:
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+# or
+bun install
+```
 
+4. Start the development server:
 ```bash
 npm run dev
 # or
@@ -21,15 +36,22 @@ pnpm dev
 bun dev
 ```
 
-For more information on what to do, read `docs/assignment.md`.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-## Tech Stack (In2event)
+### Assignment Details
+For detailed information about the assignment requirements and specifications, please refer to [`docs/assignment.md`](docs/assignment.md).
 
-- **Framework**: Next.js (React)
-- **UI**: Radix UI
-- **Language**: TypeScript
-- **Styling**: TailwindCSS
-- **Form Validation**: Zod
-- **Form Handling**: React Hook Form
-- **Table Management**: [TanStack Table](https://tanstack.com/table)
-- **Data Fetching**: [TanStack Query](https://tanstack.com/query)
+## Tech Stack
+
+This project leverages modern web technologies:
+
+- **Framework**: [Next.js](https://nextjs.org/) - React framework for production
+- **UI Components**: [Radix UI](https://www.radix-ui.com/) - Unstyled, accessible components
+- **Language**: [TypeScript](https://www.typescriptlang.org/) - Static typing for JavaScript
+- **Styling**: [TailwindCSS](https://tailwindcss.com/) - Utility-first CSS framework
+- **Form Management**:
+  - [Zod](https://zod.dev/) - TypeScript-first schema validation
+  - [React Hook Form](https://react-hook-form.com/) - Performant form handling
+- **Data Management**:
+  - [TanStack Table](https://tanstack.com/table) - Headless table management
+  - [TanStack Query](https://tanstack.com/query) - Powerful data fetching and caching
