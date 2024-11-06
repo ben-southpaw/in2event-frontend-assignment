@@ -2,7 +2,9 @@
 
 ## Overview
 
-This project is a simple Next.js application built with TypeScript, TailwindCSS, and React. Your task is to implement a **search feature** for users and display the search results in a table. Additionally, you will need to provide options to **clear the search results**, **view detailed user information**, and **add new users** through a modal form.
+This project is a simple Next.js application built with TypeScript, TailwindCSS, and React. Your task is to implement a **search feature** for users and display the search results in a table. Additionally, you will need to provide options to **clear the search results**.
+
+Please feel free to use any UI library you like if you feel that would speed up the development process. Our recommendation is [Radix UI](https://www.radix-ui.com/primitives) or [Shadcn UI](https://ui.shadcn.com/).
 
 ## Assignment Tasks
 
@@ -29,7 +31,7 @@ This project is a simple Next.js application built with TypeScript, TailwindCSS,
 - Store the user data in the component state or context.
 - Update the state based on the search query and clear search actions.
 
-### Additional Tasks for the Assignment
+### Additional Enhancements (Optional)
 
 1. **Detailed User View**:
 
@@ -43,12 +45,13 @@ This project is a simple Next.js application built with TypeScript, TailwindCSS,
 - When the form is submitted, add the new user to the table and update the component state or context.
 - Provide an option to close the modal without submitting the form, and ensure the modal can be closed by clicking outside of it or by pressing the escape key.
 
-### Additional Enhancements (Optional)
+3. **User Avatar**: Add an avatar image next to each user's name in the table to make the UI more visually appealing.
 
-- **User Avatar**: Add an avatar image next to each user's name in the table to make the UI more visually appealing.
-- **Pagination**: Implement pagination for the user table to handle large datasets efficiently.
-- **Sorting**: Allow sorting of users by name or email by clicking on the table headers.
-- **React Query Setup**: If you're willing, please set up React Query for handling services.
+4. **Pagination**: Implement pagination for the user table to handle large datasets efficiently.
+
+5. **Sorting**: Allow sorting of users by name or email by clicking on the table headers.
+
+6. **React Query Setup**: If you're willing, please set up React Query for handling services.
 
 These enhancements are not mandatory but can help you stand out and impress us! 🌟
 

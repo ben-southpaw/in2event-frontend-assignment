@@ -26,6 +26,7 @@ For more information on what to do, read `docs/assignment.md`.
 ## Tech Stack (In2event)
 
 - **Framework**: Next.js (React)
+- **UI**: Radix UI
 - **Language**: TypeScript
 - **Styling**: TailwindCSS
 - **Form Validation**: Zod
