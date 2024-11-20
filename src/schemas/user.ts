@@ -7,4 +7,5 @@ export const UserSchema = z.object({
   email: z.string().email(),
 });
 
-export type User = z.infer<typeof UserSchema>;
+// Append 'Schema' to indicate this type is derived from Zod
+export type UserSchemaType = z.infer<typeof UserSchema>;
