@@ -170,6 +170,50 @@ export function UsersTable() {
 									/>
 								</DialogContent>
 							</Dialog>
+							{/* Mobile Pagination */}
+							<div className="sm:hidden flex items-center space-x-2">
+								<button
+									onClick={handlePreviousPage}
+									disabled={currentPage === 1}
+									className="relative inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+									aria-label="Previous page"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										className="h-4 w-4"
+										viewBox="0 0 20 20"
+										fill="currentColor"
+									>
+										<path
+											fillRule="evenodd"
+											d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+											clipRule="evenodd"
+										/>
+									</svg>
+								</button>
+								<span className="text-sm font-medium text-gray-700">
+									{currentPage}/{totalPages}
+								</span>
+								<button
+									onClick={handleNextPage}
+									disabled={currentPage === totalPages}
+									className="relative inline-flex items-center justify-center w-8 h-8 rounded-full border border-gray-300 bg-white text-gray-500 hover:bg-gray-50 disabled:opacity-50"
+									aria-label="Next page"
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										className="h-4 w-4"
+										viewBox="0 0 20 20"
+										fill="currentColor"
+									>
+										<path
+											fillRule="evenodd"
+											d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+											clipRule="evenodd"
+										/>
+									</svg>
+								</button>
+							</div>
 							<Button
 								variant="outline"
 								className="relative flex items-center gap-2 hover:bg-gray-100 transition-colors hidden sm:flex"
