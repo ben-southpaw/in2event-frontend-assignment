@@ -9,6 +9,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
+	DialogDescription,
 } from '@/components/ui/dialog';
 import { Plus as PlusIcon, ChevronDown } from 'lucide-react';
 import { useUsers } from '@/services/use-users';
@@ -21,7 +22,7 @@ export function UsersTable() {
 	const [localUsers, setLocalUsers] = useState<User[]>([]);
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [currentPage, setCurrentPage] = useState(1);
-	const [sortBy, setSortBy] = useState<'id' | 'name' | 'email'>('id');
+	const [sortBy, setSortBy] = useState<'id' | 'name' | 'email' | 'newest' | null>(null);
 	const [showAll, setShowAll] = useState(false);
 	const [showScrollIndicator, setShowScrollIndicator] = useState(false);
 	const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -57,16 +58,21 @@ export function UsersTable() {
 		return () => container.removeEventListener('scroll', handleScroll);
 	}, [showScrollIndicator]);
 
-	const filteredUsers = useMemo(() => {
-		return localUsers.filter((user) =>
-			Object.values(user).some((value) =>
-				value.toString().toLowerCase().includes(searchQuery.toLowerCase())
-			)
-		);
-	}, [localUsers, searchQuery]);
+	const handleAddUser = (userData: Omit<User, 'id'>) => {
+		const maxId = Math.max(0, ...localUsers.map(user => user.id));
+		const newUser = {
+			...userData,
+			id: maxId + 1,
+		};
+		setLocalUsers((prevUsers) => [newUser, ...prevUsers]);
+		setCurrentPage(1); // Return to first page to see the new user
+		setDialogOpen(false);
+	};
 
 	const sortedUsers = useMemo(() => {
-		return [...filteredUsers].sort((a, b) => {
+		if (!sortBy) return [...localUsers]; // Create a new array to avoid mutation
+		
+		return [...localUsers].sort((a, b) => {
 			switch (sortBy) {
 				case 'id':
 					return a.id - b.id;
@@ -74,30 +80,31 @@ export function UsersTable() {
 					return a.name.localeCompare(b.name);
 				case 'email':
 					return a.email.localeCompare(b.email);
+				case 'newest':
+					return b.id - a.id;
 				default:
 					return 0;
 			}
 		});
-	}, [filteredUsers, sortBy]);
+	}, [localUsers, sortBy]);
+
+	const filteredUsers = useMemo(() => {
+		return sortedUsers.filter((user) =>
+			Object.values(user).some((value) =>
+				value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+			)
+		);
+	}, [sortedUsers, searchQuery]);
 
 	const displayedUsers = useMemo(() => {
 		if (showAll) {
-			return sortedUsers;
+			return filteredUsers;
 		}
 		const startIndex = (currentPage - 1) * itemsPerPage;
-		return sortedUsers.slice(startIndex, startIndex + itemsPerPage);
-	}, [sortedUsers, currentPage, showAll]);
+		return filteredUsers.slice(startIndex, startIndex + itemsPerPage);
+	}, [filteredUsers, currentPage, showAll]);
 
-	const totalPages = Math.ceil(sortedUsers.length / itemsPerPage);
-
-	const handleAddUser = (userData: Omit<User, 'id'>) => {
-		const newUser = {
-			...userData,
-			id: localUsers.length + 1,
-		};
-		setLocalUsers((prevUsers) => [newUser, ...prevUsers]);
-		setDialogOpen(false);
-	};
+	const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
 	const handlePreviousPage = () => {
 		setCurrentPage((prev) => Math.max(1, prev - 1));
@@ -146,9 +153,9 @@ export function UsersTable() {
 								>
 									<DialogHeader>
 										<DialogTitle>Add New User</DialogTitle>
-										<p id="add-user-description" className="text-sm text-muted-foreground">
+										<DialogDescription>
 											Fill in the details below to add a new user to the system.
-										</p>
+										</DialogDescription>
 									</DialogHeader>
 									<AddUserForm
 										onSubmit={handleAddUser}
@@ -162,12 +169,14 @@ export function UsersTable() {
 							>
 								Sort
 								<select
-									value={sortBy}
+									value={sortBy || ''}
 									onChange={(e) =>
-										setSortBy(e.target.value as 'id' | 'name' | 'email')
+										setSortBy(e.target.value as 'id' | 'name' | 'email' | 'newest' | null || null)
 									}
 									className="absolute inset-0 appearance-none opacity-0 w-full cursor-pointer"
 								>
+									<option value="">No Sort</option>
+									<option value="newest">Newest First</option>
 									<option value="id">By ID</option>
 									<option value="name">By Name</option>
 									<option value="email">By Email</option>
@@ -186,7 +195,7 @@ export function UsersTable() {
 					</div>
 					<div className="flex justify-between items-center">
 						<p className="text-sm text-muted-foreground">
-							Showing {displayedUsers.length} of {sortedUsers.length} users
+							Showing {displayedUsers.length} of {filteredUsers.length} users
 						</p>
 						{!showAll && (
 							<div className="flex items-center gap-2">
