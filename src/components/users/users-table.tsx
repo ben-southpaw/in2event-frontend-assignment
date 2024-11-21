@@ -26,7 +26,7 @@ export function UsersTable() {
 	const [currentPage, setCurrentPage] = useState(1);
 	const [sortBy, setSortBy] = useState<'id' | 'name' | 'email' | 'newest' | null>(null);
 	const [showAll, setShowAll] = useState(false);
-	const [showScrollIndicator, setShowScrollIndicator] = useState(false);
+	const [showScrollIndicator, setShowScrollIndicator] = useState(true);
 	const tableContainerRef = useRef<HTMLDivElement>(null);
 	const itemsPerPage = 10;
 
@@ -35,30 +35,6 @@ export function UsersTable() {
 			setLocalUsers(users);
 		}
 	}, [users]);
-
-	useEffect(() => {
-		if (showAll) {
-			setShowScrollIndicator(true);
-		}
-	}, [showAll]);
-
-	useEffect(() => {
-		const container = tableContainerRef.current;
-		if (!container || !showScrollIndicator) return;
-
-		const handleScroll = () => {
-			const element = container.querySelector('[data-scroll-indicator]');
-			if (element) {
-				element.classList.add('opacity-0');
-				setTimeout(() => {
-					setShowScrollIndicator(false);
-				}, 300); // Match the duration of the CSS transition
-			}
-		};
-
-		container.addEventListener('scroll', handleScroll, { once: true });
-		return () => container.removeEventListener('scroll', handleScroll);
-	}, [showScrollIndicator]);
 
 	const handleAddUser = (userData: Omit<User, 'id'>) => {
 		const maxId = Math.max(0, ...localUsers.map(user => user.id));
@@ -300,10 +276,8 @@ export function UsersTable() {
 										)}
 									</tbody>
 								</table>
-								<div className="h-32" /> {/* Bottom spacing buffer */}
-								{showScrollIndicator && (
-									<ScrollIndicator containerRef={tableContainerRef} loading={loading} />
-								)}
+								<div className="h-24" />
+								<ScrollIndicator containerRef={tableContainerRef} loading={loading} />
 							</div>
 						)}
 					</div>
