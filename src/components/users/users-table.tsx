@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog';
 import { Plus as PlusIcon, ChevronDown } from 'lucide-react';
 import { useUsers } from '@/services/use-users';
-import { User } from '@/types/user';
+import { UserSchemaType as User } from '@/schemas/user';
 import { AddUserForm } from '@/components/users/add-user-form';
 
 export function UsersTable() {
@@ -89,10 +89,10 @@ export function UsersTable() {
 	}, [localUsers, sortBy]);
 
 	const filteredUsers = useMemo(() => {
-		return sortedUsers.filter((user) =>
-			Object.values(user).some((value) =>
-				value.toString().toLowerCase().includes(searchQuery.toLowerCase())
-			)
+		const query = searchQuery.toLowerCase();
+		return sortedUsers.filter((user) => 
+			user.name.toLowerCase().includes(query) ||
+			user.email.toLowerCase().includes(query)
 		);
 	}, [sortedUsers, searchQuery]);
 
@@ -236,21 +236,22 @@ export function UsersTable() {
 						) : (
 							<div
 								ref={tableContainerRef}
-								className="h-full px-32 overflow-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+								className="h-full px-32 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
 							>
 								<table className="w-full divide-y divide-gray-200">
-									<thead className="bg-gray-50">
+									<thead className="bg-gray-50 sticky top-0 z-10 shadow-sm">
 										<tr>
-											<th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-[80px]">
+											<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-[80px]">
 												ID
 											</th>
-											<th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[200px]">
+											<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-[100px]" />
+											<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[200px]">
 												Name
 											</th>
-											<th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[160px]">
+											<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[160px]">
 												Username
 											</th>
-											<th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider min-w-[240px]">
+											<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[240px]">
 												Email
 											</th>
 										</tr>
@@ -259,8 +260,8 @@ export function UsersTable() {
 										{displayedUsers.length === 0 ? (
 											<tr>
 												<td
-													colSpan={4}
-													className="px-3 py-2 whitespace-nowrap text-sm text-center text-gray-500"
+													colSpan={5}
+													className="px-3 py-3.5 whitespace-nowrap text-sm text-center text-gray-500"
 												>
 													No users found.
 												</td>
@@ -268,16 +269,25 @@ export function UsersTable() {
 										) : (
 											displayedUsers.map((user) => (
 												<tr key={user.id} className="hover:bg-gray-50">
-													<td className="px-3 py-2 whitespace-nowrap text-sm font-medium text-gray-900 w-[80px]">
+													<td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-[80px]">
 														{user.id}
 													</td>
-													<td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500 min-w-[200px]">
+													<td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500 w-[100px]">
+														<div className="relative w-16 h-16 rounded-full overflow-hidden bg-gray-100">
+															<img
+																src={`https://api.dicebear.com/7.x/personas/svg?seed=${encodeURIComponent(user.username)}&backgroundColor=b6e3f4`}
+																alt={`${user.name}'s avatar`}
+																className="w-full h-full object-cover"
+															/>
+														</div>
+													</td>
+													<td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500 min-w-[200px]">
 														{user.name}
 													</td>
-													<td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500 min-w-[160px]">
+													<td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500 min-w-[160px]">
 														{user.username}
 													</td>
-													<td className="px-3 py-2 whitespace-nowrap text-sm text-gray-500 min-w-[240px]">
+													<td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500 min-w-[240px]">
 														{user.email}
 													</td>
 												</tr>
@@ -285,6 +295,7 @@ export function UsersTable() {
 										)}
 									</tbody>
 								</table>
+								<div className="h-32" /> {/* Bottom spacing buffer */}
 								{showScrollIndicator && (
 									<div
 										data-scroll-indicator
