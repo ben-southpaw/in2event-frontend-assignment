@@ -100,9 +100,10 @@ export function UsersTable() {
 	return (
 		<div className="h-full flex flex-col">
 			<div className="bg-white border-b">
-				<div className="px-32 py-3 space-y-3">
-					<div className="flex gap-2 items-center">
-						<div className="flex gap-2 flex-1 max-w-[calc(theme(maxWidth.sm)+theme(spacing.24))]">
+				<div className="px-4 sm:px-32 py-3 space-y-3">
+					<h1 className="text-2xl font-semibold text-gray-900 sm:hidden mb-4">Users</h1>
+					<div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-2">
+						<div className="w-full sm:flex-1 sm:max-w-[calc(theme(maxWidth.sm)+theme(spacing.24))]">
 							<Input
 								type="text"
 								placeholder="Search users..."
@@ -110,7 +111,7 @@ export function UsersTable() {
 								onChange={(e) => setSearchQuery(e.target.value)}
 							/>
 						</div>
-						<div className="flex gap-2">
+						<div className="flex gap-2 items-center">
 							<Button
 								variant="outline"
 								size="default"
@@ -143,7 +144,7 @@ export function UsersTable() {
 							</Dialog>
 							<Button
 								variant="outline"
-								className="relative flex items-center gap-2 hover:bg-gray-100 transition-colors"
+								className="relative flex items-center gap-2 hover:bg-gray-100 transition-colors hidden sm:flex"
 							>
 								Sort
 								<select
@@ -164,14 +165,14 @@ export function UsersTable() {
 								<Button
 									variant="outline"
 									onClick={handleLoadAll}
-									className="hover:bg-gray-100 transition-colors"
+									className="hover:bg-gray-100 transition-colors hidden sm:flex"
 								>
 									Show All
 								</Button>
 							)}
 						</div>
 					</div>
-					<div className="flex justify-between items-center">
+					<div className="hidden sm:flex justify-between items-center">
 						<p className="text-sm text-muted-foreground">
 							Showing {displayedUsers.length} of {filteredUsers.length} users
 						</p>
@@ -204,7 +205,31 @@ export function UsersTable() {
 				</div>
 			</div>
 
-			<div className="flex-1 min-h-0 relative">
+			{/* Mobile List View */}
+			<div className="flex-1 overflow-auto sm:hidden">
+				<div className="divide-y divide-gray-200">
+					{displayedUsers.map((user) => (
+						<div key={user.id} className="p-4 flex items-center space-x-4">
+							<div className="relative h-12 w-12 flex-shrink-0">
+								<Image
+									src={`https://api.dicebear.com/7.x/personas/svg?seed=${encodeURIComponent(user.username)}&backgroundColor=b6e3f4`}
+									alt={user.name}
+									className="rounded-full"
+									fill
+									sizes="(max-width: 48px) 100vw"
+								/>
+							</div>
+							<div className="min-w-0 flex-1">
+								<p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
+								<p className="text-sm text-gray-500 truncate">{user.email}</p>
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
+
+			{/* Desktop Table View */}
+			<div className="hidden sm:flex flex-1 min-h-0 relative">
 				<div className="absolute inset-0">
 					<div className="h-full">
 						{loading ? (
