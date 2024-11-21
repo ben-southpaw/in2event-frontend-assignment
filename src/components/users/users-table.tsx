@@ -15,6 +15,8 @@ import { Plus as PlusIcon, ChevronDown } from 'lucide-react';
 import { useUsers } from '@/services/use-users';
 import { UserSchemaType as User } from '@/schemas/user';
 import { AddUserForm } from '@/components/users/add-user-form';
+import { ScrollIndicator } from '@/components/ui/scroll-indicator';
+import Image from 'next/image';
 
 export function UsersTable() {
 	const { users, loading } = useUsers();
@@ -236,7 +238,7 @@ export function UsersTable() {
 						) : (
 							<div
 								ref={tableContainerRef}
-								className="h-full px-32 overflow-y-auto overflow-x-hidden [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:bg-gray-300 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:bg-transparent"
+								className="h-full px-32 overflow-y-auto overflow-x-hidden scrollbar-hide"
 							>
 								<table className="w-full divide-y divide-gray-200">
 									<thead className="bg-gray-50 sticky top-0 z-10 shadow-sm">
@@ -274,9 +276,12 @@ export function UsersTable() {
 													</td>
 													<td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500 w-[100px]">
 														<div className="relative w-16 h-16 rounded-full overflow-hidden bg-gray-100">
-															<img
+															<Image
+																priority
 																src={`https://api.dicebear.com/7.x/personas/svg?seed=${encodeURIComponent(user.username)}&backgroundColor=b6e3f4`}
 																alt={`${user.name}'s avatar`}
+																width={64}
+																height={64}
 																className="w-full h-full object-cover"
 															/>
 														</div>
@@ -297,31 +302,7 @@ export function UsersTable() {
 								</table>
 								<div className="h-32" /> {/* Bottom spacing buffer */}
 								{showScrollIndicator && (
-									<div
-										data-scroll-indicator
-										className="absolute bottom-8 right-8 opacity-50 transition-opacity duration-300 ease-out"
-									>
-										<div
-											className={`animate-[floatDown_2s_ease-in-out_infinite] ${
-												!showScrollIndicator ? 'opacity-0' : ''
-											}`}
-										>
-											<ChevronDown className="h-6 w-6" />
-										</div>
-										<style jsx>{`
-											@keyframes floatDown {
-												0%,
-												100% {
-													opacity: 0.3;
-													transform: translateY(-4px);
-												}
-												50% {
-													opacity: 1;
-													transform: translateY(4px);
-												}
-											}
-										`}</style>
-									</div>
+									<ScrollIndicator containerRef={tableContainerRef} loading={loading} />
 								)}
 							</div>
 						)}

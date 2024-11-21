@@ -5,6 +5,7 @@ const config: Config = {
     "./src/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  plugins: [require("tailwind-scrollbar-hide"), require("tailwindcss-animate")],
   theme: {
     container: {
       center: true,
@@ -70,7 +71,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
 };
 
 export default config;
