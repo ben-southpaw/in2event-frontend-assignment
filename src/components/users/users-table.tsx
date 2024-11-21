@@ -292,7 +292,7 @@ export function UsersTable() {
 							key={user.id}
 							className="p-4 flex items-center space-x-4 mobile-row"
 						>
-							<div className="relative h-8 w-8 flex-shrink-0 avatar-container">
+							<div className="relative h-8 w-8 flex-shrink-0 avatar-container flex items-center justify-center">
 								<Avatar
 									size={24}
 									name={user.username}
@@ -379,10 +379,10 @@ export function UsersTable() {
 													<td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-[80px]">
 														{user.id}
 													</td>
-													<td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500 w-[100px]">
-														<div className="relative h-8 w-8 sm:h-10 sm:w-10 avatar-container">
+													<td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500 w-[100px] flex items-center">
+														<div className="relative h-9 w-9 sm:h-11 sm:w-11 avatar-container">
 															<Avatar
-																size={32}
+																size={35}
 																name={user.username}
 																variant="beam"
 																colors={[
