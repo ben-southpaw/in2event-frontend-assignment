@@ -16,7 +16,19 @@ import { useUsers } from '@/services/use-users';
 import { UserSchemaType as User } from '@/schemas/user';
 import { AddUserForm } from '@/components/users/add-user-form';
 import { ScrollIndicator } from '@/components/ui/scroll-indicator';
-import Image from 'next/image';
+import Avatar from 'boring-avatars';
+
+const defaultAvatar =
+	"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='5'/%3E%3Cpath d='M20 21a8 8 0 0 0-16 0'/%3E%3C/svg%3E";
+
+const preloadImage = (url: string, priority: boolean = false) => {
+	if (typeof window === 'undefined') return; // Skip during SSR
+	const img = new window.Image();
+	img.src = url;
+	if (priority) {
+		img.fetchPriority = 'high';
+	}
+};
 
 export function UsersTable() {
 	const { users, loading } = useUsers();
@@ -24,7 +36,9 @@ export function UsersTable() {
 	const [localUsers, setLocalUsers] = useState<User[]>([]);
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [currentPage, setCurrentPage] = useState(1);
-	const [sortBy, setSortBy] = useState<'id' | 'name' | 'email' | 'newest' | null>(null);
+	const [sortBy, setSortBy] = useState<
+		'id' | 'name' | 'email' | 'newest' | null
+	>(null);
 	const [showAll, setShowAll] = useState(false);
 	const [showScrollIndicator, setShowScrollIndicator] = useState(true);
 	const tableContainerRef = useRef<HTMLDivElement>(null);
@@ -33,11 +47,23 @@ export function UsersTable() {
 	useEffect(() => {
 		if (users) {
 			setLocalUsers(users);
+			// Only preload avatars for the current page
+			const startIndex = (currentPage - 1) * itemsPerPage;
+			const endIndex = Math.min(startIndex + itemsPerPage, users.length);
+			const currentPageUsers = users.slice(startIndex, endIndex);
+
+			// Preload only the visible avatars
+			currentPageUsers.forEach((user, index) => {
+				const avatarUrl = `https://robohash.org/${encodeURIComponent(
+					user.username
+				)}?set=2&size=32x32&bgset=bg0`;
+				preloadImage(avatarUrl, index < 10);
+			});
 		}
-	}, [users]);
+	}, [users, currentPage, itemsPerPage]);
 
 	const handleAddUser = (userData: Omit<User, 'id'>) => {
-		const maxId = Math.max(0, ...localUsers.map(user => user.id));
+		const maxId = Math.max(0, ...localUsers.map((user) => user.id));
 		const newUser = {
 			...userData,
 			id: maxId + 1,
@@ -49,7 +75,7 @@ export function UsersTable() {
 
 	const sortedUsers = useMemo(() => {
 		if (!sortBy) return [...localUsers]; // Create a new array to avoid mutation
-		
+
 		return [...localUsers].sort((a, b) => {
 			switch (sortBy) {
 				case 'id':
@@ -68,9 +94,10 @@ export function UsersTable() {
 
 	const filteredUsers = useMemo(() => {
 		const query = searchQuery.toLowerCase();
-		return sortedUsers.filter((user) => 
-			user.name.toLowerCase().includes(query) ||
-			user.email.toLowerCase().includes(query)
+		return sortedUsers.filter(
+			(user) =>
+				user.name.toLowerCase().includes(query) ||
+				user.email.toLowerCase().includes(query)
 		);
 	}, [sortedUsers, searchQuery]);
 
@@ -101,7 +128,9 @@ export function UsersTable() {
 		<div className="h-full flex flex-col">
 			<div className="bg-white border-b">
 				<div className="px-4 sm:px-32 py-3 space-y-3">
-					<h1 className="text-2xl font-semibold text-gray-900 sm:hidden mb-4">Users</h1>
+					<h1 className="text-2xl font-semibold text-gray-900 sm:hidden mb-4">
+						Users
+					</h1>
 					<div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-2">
 						<div className="w-full sm:flex-1 sm:max-w-[calc(theme(maxWidth.sm)+theme(spacing.24))]">
 							<Input
@@ -109,6 +138,7 @@ export function UsersTable() {
 								placeholder="Search users..."
 								value={searchQuery}
 								onChange={(e) => setSearchQuery(e.target.value)}
+								className="text-base sm:text-sm"
 							/>
 						</div>
 						<div className="flex gap-2 items-center">
@@ -127,13 +157,11 @@ export function UsersTable() {
 										Add User
 									</Button>
 								</DialogTrigger>
-								<DialogContent
-									aria-describedby="add-user-description"
-								>
+								<DialogContent aria-describedby="add-user-description">
 									<DialogHeader>
 										<DialogTitle>Add New User</DialogTitle>
 										<DialogDescription>
-											Fill in the details below to add a new user to the system.
+											Fill in the details below
 										</DialogDescription>
 									</DialogHeader>
 									<AddUserForm
@@ -150,7 +178,14 @@ export function UsersTable() {
 								<select
 									value={sortBy || ''}
 									onChange={(e) =>
-										setSortBy(e.target.value as 'id' | 'name' | 'email' | 'newest' | null || null)
+										setSortBy(
+											(e.target.value as
+												| 'id'
+												| 'name'
+												| 'email'
+												| 'newest'
+												| null) || null
+										)
 									}
 									className="absolute inset-0 appearance-none opacity-0 w-full cursor-pointer"
 								>
@@ -173,7 +208,7 @@ export function UsersTable() {
 						</div>
 					</div>
 					<div className="hidden sm:flex justify-between items-center">
-						<p className="text-sm text-muted-foreground">
+						<p className="text-sm text-muted-foreground pl-3">
 							Showing {displayedUsers.length} of {filteredUsers.length} users
 						</p>
 						{!showAll && (
@@ -208,19 +243,29 @@ export function UsersTable() {
 			{/* Mobile List View */}
 			<div className="flex-1 overflow-auto sm:hidden">
 				<div className="divide-y divide-gray-200">
-					{displayedUsers.map((user) => (
-						<div key={user.id} className="p-4 flex items-center space-x-4">
-							<div className="relative h-12 w-12 flex-shrink-0">
-								<Image
-									src={`https://api.dicebear.com/7.x/personas/svg?seed=${encodeURIComponent(user.username)}&backgroundColor=b6e3f4`}
-									alt={user.name}
-									className="rounded-full"
-									fill
-									sizes="(max-width: 48px) 100vw"
+					{displayedUsers.map((user, index) => (
+						<div
+							key={user.id}
+							className="p-4 flex items-center space-x-4 mobile-row"
+						>
+							<div className="relative h-8 w-8 flex-shrink-0 avatar-container">
+								<Avatar
+									size={24}
+									name={user.username}
+									variant="beam"
+									colors={[
+										'#92A1C6',
+										'#146A7C',
+										'#F0AB3D',
+										'#C271B4',
+										'#C20D90',
+									]}
 								/>
 							</div>
 							<div className="min-w-0 flex-1">
-								<p className="text-sm font-medium text-gray-900 truncate">{user.name}</p>
+								<p className="text-sm font-medium text-gray-900 truncate">
+									{user.name}
+								</p>
 								<p className="text-sm text-gray-500 truncate">{user.email}</p>
 							</div>
 						</div>
@@ -244,17 +289,32 @@ export function UsersTable() {
 								<table className="w-full divide-y divide-gray-200">
 									<thead className="bg-gray-50 sticky top-0 z-10 shadow-sm">
 										<tr>
-											<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-[80px]">
+											<th
+												scope="col"
+												className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-[80px]"
+											>
 												ID
 											</th>
-											<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-[100px]" />
-											<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[200px]">
+											<th
+												scope="col"
+												className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 w-[100px]"
+											/>
+											<th
+												scope="col"
+												className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[200px]"
+											>
 												Name
 											</th>
-											<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[160px]">
+											<th
+												scope="col"
+												className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[160px]"
+											>
 												Username
 											</th>
-											<th scope="col" className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[240px]">
+											<th
+												scope="col"
+												className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900 min-w-[240px]"
+											>
 												Email
 											</th>
 										</tr>
@@ -270,20 +330,24 @@ export function UsersTable() {
 												</td>
 											</tr>
 										) : (
-											displayedUsers.map((user) => (
+											displayedUsers.map((user, index) => (
 												<tr key={user.id} className="hover:bg-gray-50">
 													<td className="px-3 py-4 whitespace-nowrap text-sm font-medium text-gray-900 w-[80px]">
 														{user.id}
 													</td>
 													<td className="px-3 py-4 whitespace-nowrap text-sm text-gray-500 w-[100px]">
-														<div className="relative w-16 h-16 rounded-full overflow-hidden bg-gray-100">
-															<Image
-																priority
-																src={`https://api.dicebear.com/7.x/personas/svg?seed=${encodeURIComponent(user.username)}&backgroundColor=b6e3f4`}
-																alt={`${user.name}'s avatar`}
-																width={64}
-																height={64}
-																className="w-full h-full object-cover"
+														<div className="relative h-8 w-8 sm:h-10 sm:w-10 avatar-container">
+															<Avatar
+																size={32}
+																name={user.username}
+																variant="beam"
+																colors={[
+																	'#92A1C6',
+																	'#146A7C',
+																	'#F0AB3D',
+																	'#C271B4',
+																	'#C20D90',
+																]}
 															/>
 														</div>
 													</td>
@@ -302,7 +366,10 @@ export function UsersTable() {
 									</tbody>
 								</table>
 								<div className="h-24" />
-								<ScrollIndicator containerRef={tableContainerRef} loading={loading} />
+								<ScrollIndicator
+									containerRef={tableContainerRef}
+									loading={loading}
+								/>
 							</div>
 						)}
 					</div>

@@ -39,7 +39,7 @@ export function AddUserForm({ onSubmit, onCancel }: AddUserFormProps) {
 					{...register('name')}
 					placeholder="Name"
 					className={cn(
-						'bg-transparent text-foreground',
+						'bg-transparent text-foreground text-base sm:text-sm',
 						errors.name ? 'border-red-500' : ''
 					)}
 				/>
@@ -53,7 +53,7 @@ export function AddUserForm({ onSubmit, onCancel }: AddUserFormProps) {
 					{...register('username')}
 					placeholder="Username"
 					className={cn(
-						'bg-transparent text-foreground',
+						'bg-transparent text-foreground text-base sm:text-sm',
 						errors.username ? 'border-red-500' : ''
 					)}
 				/>
@@ -68,7 +68,7 @@ export function AddUserForm({ onSubmit, onCancel }: AddUserFormProps) {
 					type="email"
 					placeholder="Email"
 					className={cn(
-						'bg-transparent text-foreground',
+						'bg-transparent text-foreground text-base sm:text-sm',
 						errors.email ? 'border-red-500' : ''
 					)}
 				/>

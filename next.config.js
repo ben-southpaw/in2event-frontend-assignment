@@ -8,6 +8,10 @@ const nextConfig = {
         hostname: 'api.dicebear.com',
         pathname: '/7.x/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'robohash.org',
+      },
     ],
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
