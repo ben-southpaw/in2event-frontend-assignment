@@ -9,8 +9,14 @@ const workSans = Work_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'Users Management',
-  description: 'Manage your users',
+  title: 'In2event Users',
+  description: 'User management interface for In2event',
+  icons: [
+    { rel: 'icon', url: '/favicon.svg', type: 'image/svg+xml' },
+    { rel: 'icon', url: '/icon.svg' },
+    { rel: 'shortcut icon', url: '/favicon.svg' },
+    { rel: 'apple-touch-icon', url: '/icon.svg' },
+  ],
 };
 
 export default function RootLayout({
