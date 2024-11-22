@@ -6,11 +6,13 @@ import { ChevronDown } from 'lucide-react';
 interface ScrollIndicatorProps {
 	containerRef: React.RefObject<HTMLElement>;
 	loading?: boolean;
+	totalItems?: number;
 }
 
 export const ScrollIndicator = memo(function ScrollIndicator({
 	containerRef,
 	loading,
+	totalItems = 0,
 }: ScrollIndicatorProps) {
 	const [isVisible, setIsVisible] = useState(true);
 	const [isMounted, setIsMounted] = useState(true);
@@ -31,7 +33,7 @@ export const ScrollIndicator = memo(function ScrollIndicator({
 		return () => container.removeEventListener('scroll', handleScroll);
 	}, [isVisible, containerRef, loading]);
 
-	if (!isMounted) return null;
+	if (!isMounted || totalItems < 6) return null;
 
 	return (
 		<div

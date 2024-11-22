@@ -1,6 +1,4 @@
-'use client';
-
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -11,23 +9,19 @@ import {
 	DialogTrigger,
 	DialogDescription,
 } from '@/components/ui/dialog';
-import { Plus as PlusIcon, ChevronDown } from 'lucide-react';
+import { Plus as PlusIcon } from 'lucide-react';
 import { useUsers } from '@/services/use-users';
 import { UserSchemaType as User } from '@/schemas/user';
 import { AddUserForm } from '@/components/users/add-user-form';
 import { ScrollIndicator } from '@/components/ui/scroll-indicator';
 import Avatar from 'boring-avatars';
+import { preloadImage } from '@/utils/image-utils';
 
-const defaultAvatar =
-	"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='8' r='5'/%3E%3Cpath d='M20 21a8 8 0 0 0-16 0'/%3E%3C/svg%3E";
-
-const preloadImage = (url: string, priority: boolean = false) => {
-	if (typeof window === 'undefined') return; // Skip during SSR
-	const img = new window.Image();
-	img.src = url;
-	if (priority) {
-		img.fetchPriority = 'high';
-	}
+const sortFunctions = {
+	id: (a: User, b: User) => a.id - b.id,
+	name: (a: User, b: User) => a.name.localeCompare(b.name),
+	email: (a: User, b: User) => a.email.localeCompare(b.email),
+	newest: (a: User, b: User) => b.id - a.id,
 };
 
 export function UsersTable() {
@@ -36,23 +30,18 @@ export function UsersTable() {
 	const [localUsers, setLocalUsers] = useState<User[]>([]);
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [currentPage, setCurrentPage] = useState(1);
-	const [sortBy, setSortBy] = useState<
-		'id' | 'name' | 'email' | 'newest' | null
-	>(null);
+	const [sortBy, setSortBy] = useState<keyof typeof sortFunctions | null>(null);
 	const [showAll, setShowAll] = useState(false);
-	const [showScrollIndicator, setShowScrollIndicator] = useState(true);
 	const tableContainerRef = useRef<HTMLDivElement>(null);
 	const itemsPerPage = 10;
 
 	useEffect(() => {
 		if (users) {
 			setLocalUsers(users);
-			// Only preload avatars for the current page
 			const startIndex = (currentPage - 1) * itemsPerPage;
 			const endIndex = Math.min(startIndex + itemsPerPage, users.length);
 			const currentPageUsers = users.slice(startIndex, endIndex);
 
-			// Preload only the visible avatars
 			currentPageUsers.forEach((user, index) => {
 				const avatarUrl = `https://robohash.org/${encodeURIComponent(
 					user.username
@@ -60,36 +49,20 @@ export function UsersTable() {
 				preloadImage(avatarUrl, index < 10);
 			});
 		}
-	}, [users, currentPage, itemsPerPage]);
+	}, [users, currentPage]);
 
-	const handleAddUser = (userData: Omit<User, 'id'>) => {
-		const maxId = Math.max(0, ...localUsers.map((user) => user.id));
-		const newUser = {
-			...userData,
-			id: maxId + 1,
-		};
-		setLocalUsers((prevUsers) => [newUser, ...prevUsers]);
-		setCurrentPage(1); // Return to first page to see the new user
+	const handleAddUser = useCallback((userData: Omit<User, 'id'>) => {
+		setLocalUsers((prevUsers) => {
+			const maxId = Math.max(0, ...prevUsers.map((user) => user.id));
+			return [{ ...userData, id: maxId + 1 }, ...prevUsers];
+		});
+		setCurrentPage(1);
 		setDialogOpen(false);
-	};
+	}, []);
 
 	const sortedUsers = useMemo(() => {
-		if (!sortBy) return [...localUsers]; // Create a new array to avoid mutation
-
-		return [...localUsers].sort((a, b) => {
-			switch (sortBy) {
-				case 'id':
-					return a.id - b.id;
-				case 'name':
-					return a.name.localeCompare(b.name);
-				case 'email':
-					return a.email.localeCompare(b.email);
-				case 'newest':
-					return b.id - a.id;
-				default:
-					return 0;
-			}
-		});
+		if (!sortBy) return [...localUsers];
+		return [...localUsers].sort(sortFunctions[sortBy]);
 	}, [localUsers, sortBy]);
 
 	const filteredUsers = useMemo(() => {
@@ -102,27 +75,25 @@ export function UsersTable() {
 	}, [sortedUsers, searchQuery]);
 
 	const displayedUsers = useMemo(() => {
-		if (showAll) {
-			return filteredUsers;
-		}
+		if (showAll) return filteredUsers;
 		const startIndex = (currentPage - 1) * itemsPerPage;
 		return filteredUsers.slice(startIndex, startIndex + itemsPerPage);
 	}, [filteredUsers, currentPage, showAll]);
 
 	const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
-	const handlePreviousPage = () => {
+	const handlePreviousPage = useCallback(() => {
 		setCurrentPage((prev) => Math.max(1, prev - 1));
-	};
+	}, []);
 
-	const handleNextPage = () => {
+	const handleNextPage = useCallback(() => {
 		setCurrentPage((prev) => Math.min(totalPages, prev + 1));
-	};
+	}, [totalPages]);
 
-	const handleLoadAll = () => {
+	const handleLoadAll = useCallback(() => {
 		setShowAll(true);
 		setCurrentPage(1);
-	};
+	}, []);
 
 	return (
 		<div className="h-full flex flex-col">
@@ -413,6 +384,7 @@ export function UsersTable() {
 								<ScrollIndicator
 									containerRef={tableContainerRef}
 									loading={loading}
+									totalItems={displayedUsers.length}
 								/>
 							</div>
 						)}
