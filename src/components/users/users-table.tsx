@@ -108,7 +108,10 @@ export function UsersTable() {
 								type="text"
 								placeholder="Search users..."
 								value={searchQuery}
-								onChange={(e) => setSearchQuery(e.target.value)}
+								onChange={(e) => {
+									setSearchQuery(e.target.value);
+									setCurrentPage(1);
+								}}
 								className="text-base sm:text-sm"
 							/>
 						</div>
@@ -117,7 +120,10 @@ export function UsersTable() {
 								variant="outline"
 								size="default"
 								className="hover:bg-gray-100 transition-colors"
-								onClick={() => setSearchQuery('')}
+								onClick={() => {
+									setSearchQuery('');
+									setCurrentPage(1);
+								}}
 							>
 								Clear Search
 							</Button>
