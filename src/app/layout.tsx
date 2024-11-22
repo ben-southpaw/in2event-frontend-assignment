@@ -1,6 +1,7 @@
 import './globals.css';
 import type { Metadata } from 'next';
 import { Work_Sans } from 'next/font/google';
+import Providers from './providers';
 
 const workSans = Work_Sans({
 	subsets: ['latin'],
@@ -43,7 +44,9 @@ export default function RootLayout({
 					content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
 				/>
 			</head>
-			<body className="page-fade-in">{children}</body>
+			<body className="page-fade-in">
+				<Providers>{children}</Providers>
+			</body>
 		</html>
 	);
 }

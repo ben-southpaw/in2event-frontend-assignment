@@ -10,7 +10,7 @@ import {
 	DialogDescription,
 } from '@/components/ui/dialog';
 import { Plus as PlusIcon } from 'lucide-react';
-import { useUsers } from '@/services/use-users';
+import { useUsers } from '@/services/users';
 import { UserSchemaType as User } from '@/schemas/user';
 import { AddUserForm } from '@/components/users/add-user-form';
 import { ScrollIndicator } from '@/components/ui/scroll-indicator';
@@ -25,7 +25,7 @@ const sortFunctions = {
 };
 
 export function UsersTable() {
-	const { users, loading } = useUsers();
+	const { data: users, isLoading: loading } = useUsers();
 	const [searchQuery, setSearchQuery] = useState('');
 	const [localUsers, setLocalUsers] = useState<User[]>([]);
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -46,20 +46,20 @@ export function UsersTable() {
 	const fuzzyMatch = (text: string, term: string): boolean => {
 		text = normalizeText(text);
 		term = normalizeText(term);
-		
+
 		if (text.includes(term)) return true;
-		
+
 		// Check for consecutive character matches
 		let textIndex = 0;
 		let termIndex = 0;
-		
+
 		while (textIndex < text.length && termIndex < term.length) {
 			if (text[textIndex] === term[termIndex]) {
 				termIndex++;
 			}
 			textIndex++;
 		}
-		
+
 		return termIndex === term.length;
 	};
 
@@ -96,18 +96,13 @@ export function UsersTable() {
 	const filteredUsers = useMemo(() => {
 		const query = searchQuery.trim();
 		if (!query) return sortedUsers;
-		
+
 		const searchTerms = query.split(/\s+/);
 		return sortedUsers.filter((user) => {
-			const searchableFields = [
-				user.name,
-				user.email
-			];
-			
-			return searchTerms.every(term => 
-				searchableFields.some(field => 
-					fuzzyMatch(field, term)
-				)
+			const searchableFields = [user.name, user.email];
+
+			return searchTerms.every((term) =>
+				searchableFields.some((field) => fuzzyMatch(field, term))
 			);
 		});
 	}, [sortedUsers, searchQuery]);
@@ -136,7 +131,7 @@ export function UsersTable() {
 	return (
 		<div className="h-full flex flex-col">
 			<div className="bg-white border-b">
-				<div className="px-4 sm:px-32 py-3 space-y-3">
+				<div className="px-4 sm:px-32 py-3 space-y-3 min-h-[120px]">
 					<h1 className="text-2xl font-semibold text-gray-900 sm:hidden mb-4">
 						Users
 					</h1>
@@ -266,7 +261,7 @@ export function UsersTable() {
 							)}
 						</div>
 					</div>
-					<div className="hidden sm:flex justify-between items-center">
+					<div className="hidden sm:flex justify-between items-center min-h-[32px]">
 						<p className="text-sm text-muted-foreground pl-3">
 							Showing {displayedUsers.length} of {filteredUsers.length} users
 						</p>
@@ -343,7 +338,7 @@ export function UsersTable() {
 						) : (
 							<div
 								ref={tableContainerRef}
-								className="h-full px-32 overflow-y-auto overflow-x-hidden scrollbar-hide"
+								className="h-full px-32 overflow-y-auto overflow-x-hidden scrollbar-hide min-h-[400px]"
 							>
 								<table className="w-full divide-y divide-gray-200">
 									<thead className="bg-gray-50 sticky top-0 z-10 shadow-sm">
