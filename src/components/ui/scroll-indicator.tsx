@@ -24,7 +24,7 @@ export const ScrollIndicator = memo(function ScrollIndicator({
 		const handleScroll = () => {
 			if (isVisible) {
 				setIsVisible(false);
-				// Unmount after animation completes
+				// Remove afterany scrollng
 				setTimeout(() => setIsMounted(false), 300);
 			}
 		};

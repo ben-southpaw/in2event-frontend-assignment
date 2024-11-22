@@ -17,7 +17,7 @@ const nextConfig = {
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
-  // Set a custom port for development
+  // Avoid port conflicts dammit
   env: {
     PORT: '3333',
   },

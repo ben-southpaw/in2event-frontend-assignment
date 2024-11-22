@@ -2,7 +2,7 @@ import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
 import { afterEach } from 'vitest';
 
-// Make jest-dom types available
+// Not quite working
 declare global {
 	namespace jest {
 		interface Matchers<R> {

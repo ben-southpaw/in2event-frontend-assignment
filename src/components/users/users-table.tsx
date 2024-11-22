@@ -39,8 +39,8 @@ export function UsersTable() {
 		return text
 			.toLowerCase()
 			.normalize('NFD')
-			.replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-			.replace(/[^a-z0-9\s]/g, ''); // Remove special characters except spaces
+			.replace(/[\u0300-\u036f]/g, '') 
+			.replace(/[^a-z0-9\s]/g, ''); 
 	};
 
 	const fuzzyMatch = (text: string, term: string): boolean => {
@@ -49,7 +49,7 @@ export function UsersTable() {
 
 		if (text.includes(term)) return true;
 
-		// Check for consecutive character matches
+		// Check for consecutive character matches, looser typing allowed
 		let textIndex = 0;
 		let termIndex = 0;
 
@@ -170,9 +170,7 @@ export function UsersTable() {
 								<DialogContent aria-describedby="add-user-description">
 									<DialogHeader>
 										<DialogTitle>Add New User</DialogTitle>
-										<DialogDescription>
-											Fill in the details below
-										</DialogDescription>
+										<DialogDescription>Fill in details below</DialogDescription>
 									</DialogHeader>
 									<AddUserForm
 										onSubmit={handleAddUser}
@@ -261,12 +259,12 @@ export function UsersTable() {
 							)}
 						</div>
 					</div>
-					<div className="hidden sm:flex justify-between items-center min-h-[32px]">
-						<p className="text-sm text-muted-foreground pl-3">
-							Showing {displayedUsers.length} of {filteredUsers.length} users
+					<div className="hidden sm:flex justify-between items-center h-[32px] mb-1">
+						<p className="text-sm text-muted-foreground">
+							Displaying {displayedUsers.length} of {filteredUsers.length} users
 						</p>
 						{!showAll && (
-							<div className="flex items-center gap-2">
+							<div className="flex items-center gap-2 h-full">
 								<Button
 									variant="outline"
 									size="sm"
