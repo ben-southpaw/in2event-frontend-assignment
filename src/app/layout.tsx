@@ -4,8 +4,19 @@ import { Work_Sans } from 'next/font/google';
 
 const workSans = Work_Sans({
 	subsets: ['latin'],
-	display: 'swap',
+	display: 'block',
 	weight: ['400', '500', '600', '700'],
+	preload: true,
+	fallback: [
+		'system-ui',
+		'-apple-system',
+		'BlinkMacSystemFont',
+		'Segoe UI',
+		'Roboto',
+		'sans-serif',
+	],
+	adjustFontFallback: true,
+	variable: '--font-work-sans',
 });
 
 export const metadata: Metadata = {
@@ -25,14 +36,14 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<html lang="en" className={workSans.className}>
+		<html lang="en" className={`${workSans.variable} ${workSans.className}`}>
 			<head>
 				<meta
 					name="viewport"
 					content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0"
 				/>
 			</head>
-			<body>{children}</body>
+			<body className="page-fade-in">{children}</body>
 		</html>
 	);
 }

@@ -35,6 +35,34 @@ export function UsersTable() {
 	const tableContainerRef = useRef<HTMLDivElement>(null);
 	const itemsPerPage = 10;
 
+	const normalizeText = (text: string): string => {
+		return text
+			.toLowerCase()
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+			.replace(/[^a-z0-9\s]/g, ''); // Remove special characters except spaces
+	};
+
+	const fuzzyMatch = (text: string, term: string): boolean => {
+		text = normalizeText(text);
+		term = normalizeText(term);
+		
+		if (text.includes(term)) return true;
+		
+		// Check for consecutive character matches
+		let textIndex = 0;
+		let termIndex = 0;
+		
+		while (textIndex < text.length && termIndex < term.length) {
+			if (text[textIndex] === term[termIndex]) {
+				termIndex++;
+			}
+			textIndex++;
+		}
+		
+		return termIndex === term.length;
+	};
+
 	useEffect(() => {
 		if (users) {
 			setLocalUsers(users);
@@ -66,12 +94,22 @@ export function UsersTable() {
 	}, [localUsers, sortBy]);
 
 	const filteredUsers = useMemo(() => {
-		const query = searchQuery.toLowerCase();
-		return sortedUsers.filter(
-			(user) =>
-				user.name.toLowerCase().includes(query) ||
-				user.email.toLowerCase().includes(query)
-		);
+		const query = searchQuery.trim();
+		if (!query) return sortedUsers;
+		
+		const searchTerms = query.split(/\s+/);
+		return sortedUsers.filter((user) => {
+			const searchableFields = [
+				user.name,
+				user.email
+			];
+			
+			return searchTerms.every(term => 
+				searchableFields.some(field => 
+					fuzzyMatch(field, term)
+				)
+			);
+		});
 	}, [sortedUsers, searchQuery]);
 
 	const displayedUsers = useMemo(() => {
